@@ -43,43 +43,41 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
         ref={searchContainerRef}
         className="relative w-full"
       >
-        <Command className="overflow-visible rounded-full border bg-background shadow-lg transition hover:shadow-xl dark:border-gray-700">
-          <div className="flex items-center p-2">
-            <div className="flex-grow">
+        <div className="flex items-center rounded-full border bg-background p-2 shadow-lg transition hover:shadow-xl dark:border-gray-700">
+            <Search className="ml-2 mr-4 h-5 w-5 shrink-0 text-muted-foreground" />
+            <Command className="flex-grow overflow-visible bg-transparent">
               <CommandInput
                 placeholder="Which city are you chilling in?"
                 value={inputValue}
                 onValueChange={setInputValue}
                 onFocus={() => setShowSuggestions(true)}
-                className="h-12 w-full border-0 bg-transparent px-6 text-lg focus:ring-0 focus-visible:ring-offset-0"
+                className="h-12 w-full border-0 bg-transparent p-0 text-lg focus:ring-0 focus-visible:ring-offset-0"
               />
-            </div>
-            <Button type="submit" size="lg" className="rounded-full bg-primary px-6 text-primary-foreground">
+              {showSuggestions && (
+                <CommandList className="absolute left-0 top-full z-50 mt-2 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
+                  <CommandEmpty>No city found.</CommandEmpty>
+                  <CommandGroup heading="Suggestions">
+                    {popularCities.map((city) => (
+                      <CommandItem
+                        key={city}
+                        value={city}
+                        onSelect={(currentValue) => {
+                          setInputValue(currentValue);
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        {city}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              )}
+            </Command>
+          <Button type="submit" size="lg" className="ml-2 rounded-full bg-primary px-6 text-primary-foreground">
               <Search className="mr-2 h-5 w-5" />
               Brew
             </Button>
-          </div>
-          {showSuggestions && (
-            <CommandList className="absolute top-full z-50 mt-2 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
-              <CommandEmpty>No city found.</CommandEmpty>
-              <CommandGroup heading="Suggestions">
-                {popularCities.map((city) => (
-                  <CommandItem
-                    key={city}
-                    value={city}
-                    onSelect={(currentValue) => {
-                      const selectedCity = popularCities.find(c => c.toLowerCase() === currentValue) || city;
-                      setInputValue(selectedCity);
-                      setShowSuggestions(false);
-                    }}
-                  >
-                    {city}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          )}
-        </Command>
+        </div>
       </div>
     </form>
   );
