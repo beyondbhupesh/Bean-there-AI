@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { popularCities } from '@/data/popularCities';
+import { cn } from '@/lib/utils';
 
 interface SearchBarProps {
   onSearch: (city: string) => void;
@@ -60,25 +61,23 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
                 onFocus={() => setShowSuggestions(true)}
                 className="h-12 w-full border-0 bg-transparent p-0 text-lg focus:ring-0 focus-visible:ring-offset-0"
               />
-              {showSuggestions && (
-                <CommandList className="absolute left-0 top-full z-50 mt-2 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
-                  {filteredCities.length > 0 ? (
-                    <CommandGroup heading="Suggestions">
-                      {filteredCities.map((city) => (
-                        <CommandItem
-                          key={city}
-                          value={city}
-                          onSelect={handleSelect}
-                        >
-                          {city}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  ) : (
-                    <CommandEmpty>No city found.</CommandEmpty>
-                  )}
-                </CommandList>
-              )}
+              <CommandList className={cn("absolute left-0 top-full z-50 mt-2 w-full rounded-md border bg-popover text-popover-foreground shadow-md", { 'hidden': !showSuggestions })}>
+                {filteredCities.length > 0 ? (
+                  <CommandGroup heading="Suggestions">
+                    {filteredCities.map((city) => (
+                      <CommandItem
+                        key={city}
+                        value={city}
+                        onSelect={handleSelect}
+                      >
+                        {city}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                ) : (
+                  <CommandEmpty>No city found.</CommandEmpty>
+                )}
+              </CommandList>
             </Command>
           <Button type="submit" size="lg" className="ml-2 rounded-full bg-primary px-6 text-primary-foreground">
               <Search className="mr-2 h-5 w-5" />
