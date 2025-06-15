@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import CoffeeShopCard from '@/components/CoffeeShopCard';
-import CoffeeBeanIcon from '@/components/icons/CoffeeBeanIcon';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -81,10 +79,7 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground">
       {!hasSearched ? (
         <div className="flex h-screen flex-col items-center justify-center p-4">
-           <div className="flex items-center space-x-4 mb-4">
-              <CoffeeBeanIcon className="h-16 w-16 text-primary" />
-              <h1 className="text-6xl font-bold tracking-tighter">Bean There</h1>
-            </div>
+           <h1 className="mb-4 text-6xl font-bold tracking-tighter">Bean There</h1>
           <p className="mb-8 max-w-lg text-center text-xl text-muted-foreground">Discover the specialty coffee shops in your city or the one you're headed to</p>
           <SearchBar onSearch={handleSearch} />
         </div>
