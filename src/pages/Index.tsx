@@ -117,7 +117,7 @@ const Index = () => {
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h2 className="text-3xl font-bold">Top coffee spots in <span className="text-primary">{city}</span></h2>
-                <p className="text-muted-foreground">Sourced live from the web. (Using sample data for now)</p>
+                <p className="text-muted-foreground">Sourced live from the web.</p>
               </div>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                 <div className="flex items-center space-x-2">
