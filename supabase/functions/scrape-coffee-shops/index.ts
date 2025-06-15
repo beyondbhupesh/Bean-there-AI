@@ -65,8 +65,19 @@ serve(async (req) => {
     }
     
     console.log(`Found ${scrapedShops.length} coffee shops from Google Places.`);
+
+    // De-duplicate shops before upserting to prevent "cannot affect row a second time" error
+    const uniqueShopsMap = new Map();
+    scrapedShops.forEach(shop => {
+      const key = `${shop.name}|${shop.city}`;
+      if (!uniqueShopsMap.has(key)) {
+        uniqueShopsMap.set(key, shop);
+      }
+    });
+    const uniqueScrapedShops = Array.from(uniqueShopsMap.values());
+    console.log(`Found ${uniqueScrapedShops.length} unique coffee shops to upsert.`);
     
-    if (scrapedShops.length === 0) {
+    if (uniqueScrapedShops.length === 0) {
       return new Response(JSON.stringify({ data: [] }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -80,7 +91,7 @@ serve(async (req) => {
 
     const { data, error } = await supabaseAdmin
       .from('coffee_shops')
-      .upsert(scrapedShops, { onConflict: 'name,city' })
+      .upsert(uniqueScrapedShops, { onConflict: 'name,city' })
       .select()
 
     if (error) {
