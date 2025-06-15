@@ -7,8 +7,17 @@ interface CoffeeShopCardProps {
 }
 
 const CoffeeShopCard = ({ shop }: CoffeeShopCardProps) => {
+  const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(
+    `${shop.name}, ${shop.city}`
+  )}`;
+
   return (
-    <div className="group col-span-1 cursor-pointer">
+    <a
+      href={googleSearchUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group col-span-1 cursor-pointer"
+    >
       <div className="flex w-full flex-col gap-2">
         <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-muted">
           <img
@@ -30,7 +39,7 @@ const CoffeeShopCard = ({ shop }: CoffeeShopCardProps) => {
         {shop.category && <div className="text-sm text-muted-foreground">{shop.category}</div>}
         {shop.description && <div className="text-sm text-muted-foreground truncate">{shop.description}</div>}
       </div>
-    </div>
+    </a>
   );
 };
 
