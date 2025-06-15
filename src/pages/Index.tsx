@@ -105,18 +105,18 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {!hasSearched ? (
-        <div className="flex h-screen flex-col items-center justify-center p-4">
-           <h1 className="mb-4 text-6xl font-bold tracking-tighter">Bean There</h1>
-          <p className="mb-8 max-w-lg text-center text-xl text-muted-foreground">Discover the specialty coffee shops in your city or the one you're headed to</p>
+        <div className="flex h-screen flex-col items-center justify-center p-4 text-center">
+           <h1 className="mb-4 text-4xl font-bold tracking-tighter sm:text-6xl">Bean There</h1>
+          <p className="mb-8 max-w-lg text-lg text-muted-foreground sm:text-xl">Discover the specialty coffee shops in your city or the one you're headed to</p>
           <SearchBar onSearch={handleSearch} />
         </div>
       ) : (
         <>
           <Header />
           <main className="container mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
-            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <h2 className="text-3xl font-bold">Top coffee spots in <span className="text-primary">{city}</span></h2>
+                <h2 className="text-2xl font-bold sm:text-3xl">Top coffee spots in <span className="text-primary">{city}</span></h2>
                 <p className="text-muted-foreground">Sourced live from the web.</p>
               </div>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2">

@@ -59,7 +59,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
                 value={inputValue}
                 onValueChange={setInputValue}
                 onFocus={() => setShowSuggestions(true)}
-                className="h-12 w-full border-0 bg-transparent p-0 text-lg focus:ring-0 focus-visible:ring-offset-0"
+                className="h-12 w-full border-0 bg-transparent p-0 text-base focus:ring-0 focus-visible:ring-offset-0 sm:text-lg"
               />
               <CommandList className={cn("absolute left-0 top-full z-50 mt-2 w-full rounded-md border bg-popover text-popover-foreground shadow-md", { 'hidden': !showSuggestions })}>
                 {filteredCities.length > 0 ? (
@@ -79,9 +79,9 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
                 )}
               </CommandList>
             </Command>
-          <Button type="submit" size="lg" className="ml-2 rounded-full bg-primary px-6 text-primary-foreground">
-              <Search className="mr-2 h-5 w-5" />
-              Brew
+          <Button type="submit" size="lg" className="ml-2 rounded-full bg-primary px-4 text-primary-foreground sm:px-6">
+              <Search className="h-5 w-5 sm:mr-2" />
+              <span className="hidden sm:inline">Brew</span>
             </Button>
         </div>
       </div>
