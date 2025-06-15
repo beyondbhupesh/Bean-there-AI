@@ -66,7 +66,7 @@ serve(async (req) => {
     
     console.log(`Found ${scrapedShops.length} coffee shops from Google Places.`);
 
-    // De-duplicate shops before upserting to prevent "cannot affect row a second time" error
+    // De-duplicate shops from the API response
     const uniqueShopsMap = new Map();
     scrapedShops.forEach(shop => {
       const key = `${shop.name}|${shop.city}`;
@@ -75,7 +75,7 @@ serve(async (req) => {
       }
     });
     const uniqueScrapedShops = Array.from(uniqueShopsMap.values());
-    console.log(`Found ${uniqueScrapedShops.length} unique coffee shops to upsert.`);
+    console.log(`Found ${uniqueScrapedShops.length} unique coffee shops from scraping.`);
     
     if (uniqueScrapedShops.length === 0) {
       return new Response(JSON.stringify({ data: [] }), {
@@ -84,18 +84,48 @@ serve(async (req) => {
       })
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error("Supabase project environment variables are not set.");
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
+    // Fetch shops already in our DB for the given city
+    const { data: existingShops, error: fetchError } = await supabaseAdmin
+      .from('coffee_shops')
+      .select('name')
+      .eq('city', city);
+
+    if (fetchError) {
+      console.error('Error fetching existing shops:', fetchError);
+      throw fetchError;
+    }
+    
+    const existingShopNames = new Set(existingShops.map(s => s.name));
+    
+    // Filter out shops that are already in the database
+    const newShopsToInsert = uniqueScrapedShops.filter(s => !existingShopNames.has(s.name));
+
+    console.log(`Found ${newShopsToInsert.length} new coffee shops to insert.`);
+
+    if (newShopsToInsert.length === 0) {
+      return new Response(JSON.stringify({ data: [] }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    // Insert only the new shops
     const { data, error } = await supabaseAdmin
       .from('coffee_shops')
-      .upsert(uniqueScrapedShops, { onConflict: 'name,city' })
+      .insert(newShopsToInsert)
       .select()
 
     if (error) {
-      console.error('Error upserting data:', error)
+      console.error('Error inserting new data:', error)
       throw error
     }
 
@@ -111,4 +141,3 @@ serve(async (req) => {
     })
   }
 })
-
