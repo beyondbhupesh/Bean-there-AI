@@ -1,7 +1,6 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,64 +21,50 @@ serve(async (req) => {
       })
     }
 
-    console.log(`Scraping coffee shops for city: ${city}`);
+    console.log(`Fetching coffee shops for city: ${city} from Google Places API`);
     
-    const searchUrl = `https://www.yellowpages.com/search?search_terms=coffee&geo_location_terms=${encodeURIComponent(city)}`;
+    const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
+    if (!apiKey) {
+      throw new Error("GOOGLE_PLACES_API_KEY is not set in Supabase secrets.");
+    }
     
-    const response = await fetch(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      },
-    });
+    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=coffee shops in ${encodeURIComponent(city)}&key=${apiKey}`;
+    
+    const response = await fetch(searchUrl);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch from Yellow Pages: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch from Google Places API: ${response.status} ${response.statusText}`);
     }
 
-    const html = await response.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
+    const googleData = await response.json();
 
-    if (!doc) {
-      throw new Error("Failed to parse HTML from Yellow Pages");
-    }
-
-    const scrapedShops: any[] = [];
-    const results = doc.querySelectorAll('.result');
-
-    for (const result of results) {
-      const name = result.querySelector('a.business-name span')?.textContent?.trim();
-      if (!name) continue;
-
-      const category = result.querySelector('.categories a')?.textContent?.trim();
-      const description = result.querySelector('.snippet-container .snippet-line-1')?.textContent?.trim();
-      const image = result.querySelector('.media-thumbnail img')?.getAttribute('src');
-
-      const tripAdvisorData = result.querySelector('.ratings')?.getAttribute('data-tripadvisor');
-      let rating = null;
-      let review_count = null;
-      if (tripAdvisorData) {
-        try {
-          const taJson = JSON.parse(tripAdvisorData);
-          rating = parseFloat(taJson.rating) || null;
-          review_count = parseInt(taJson.count) || null;
-        } catch (e) {
-          console.error('Failed to parse TripAdvisor data', e);
-        }
-      }
-
-      scrapedShops.push({
-        name,
-        rating,
-        review_count,
-        category: category || 'Coffee & Tea',
-        price: null, // Not available from this source
-        description,
-        image,
-        city,
-      });
+    if (googleData.status !== 'OK' && googleData.status !== 'ZERO_RESULTS') {
+      throw new Error(`Google Places API Error: ${googleData.status} - ${googleData.error_message || 'No error message provided.'}`);
     }
     
-    console.log(`Scraped ${scrapedShops.length} coffee shops from Yellow Pages.`);
+    const scrapedShops: any[] = [];
+    if (googleData.results) {
+        for (const place of googleData.results) {
+            const image = place.photos && place.photos.length > 0 
+                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${apiKey}`
+                : null;
+
+            const price = place.price_level ? '$'.repeat(place.price_level) : null;
+
+            scrapedShops.push({
+                name: place.name,
+                rating: place.rating || null,
+                review_count: place.user_ratings_total || null,
+                category: place.types?.includes('cafe') ? 'Cafe' : 'Coffee Shop',
+                price,
+                description: place.formatted_address, // Using address as description
+                image,
+                city,
+            });
+        }
+    }
+    
+    console.log(`Found ${scrapedShops.length} coffee shops from Google Places.`);
     
     if (scrapedShops.length === 0) {
       return new Response(JSON.stringify({ data: [] }), {
@@ -115,3 +100,4 @@ serve(async (req) => {
     })
   }
 })
+
