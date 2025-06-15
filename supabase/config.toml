@@ -1,1 +1,5 @@
+
 project_id = "joseqgmwmxvxpfoaiyna"
+
+[functions.scrape-coffee-shops]
+  verify_jwt = false
