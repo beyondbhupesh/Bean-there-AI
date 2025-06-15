@@ -55,7 +55,7 @@ const Index = () => {
         .from('coffee_shops')
         .select('*')
         .eq('city', city)
-        .order('rating', { ascending: false, nulls: 'last' });
+        .order('rating', { ascending: false, nullsFirst: false });
 
       if (error) {
         throw new Error(`Failed to fetch shops: ${error.message}`);
