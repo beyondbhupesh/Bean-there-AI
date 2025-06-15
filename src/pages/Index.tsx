@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import CoffeeShopCard from '@/components/CoffeeShopCard';
-import { Coffee } from 'lucide-react';
+import CoffeeBeanIcon from '@/components/icons/CoffeeBeanIcon';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -81,7 +82,7 @@ const Index = () => {
       {!hasSearched ? (
         <div className="flex h-screen flex-col items-center justify-center p-4">
            <div className="flex items-center space-x-4 mb-4">
-              <Coffee className="h-16 w-16 text-primary" />
+              <CoffeeBeanIcon className="h-16 w-16 text-primary" />
               <h1 className="text-6xl font-bold tracking-tighter">Bean There</h1>
             </div>
           <p className="mb-8 max-w-lg text-center text-xl text-muted-foreground">Discover the specialty coffee shops in your city or the one you're headed to</p>
