@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -34,6 +34,13 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
     };
   }, []);
 
+  const handleSelect = useCallback((currentValue: string) => {
+    setInputValue(currentValue);
+    setShowSuggestions(false);
+  }, []);
+
+  const filteredCities = popularCities.filter((city) => city.toLowerCase().includes(inputValue.toLowerCase()));
+
   return (
     <form
       onSubmit={handleSearch}
@@ -45,7 +52,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
       >
         <div className="flex items-center rounded-full border bg-background p-2 shadow-lg transition hover:shadow-xl dark:border-gray-700">
             <Search className="ml-2 mr-4 h-5 w-5 shrink-0 text-muted-foreground" />
-            <Command className="flex-grow overflow-visible bg-transparent">
+            <Command shouldFilter={false} className="flex-grow overflow-visible bg-transparent">
               <CommandInput
                 placeholder="Which city are you chilling in?"
                 value={inputValue}
@@ -55,21 +62,21 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
               />
               {showSuggestions && (
                 <CommandList className="absolute left-0 top-full z-50 mt-2 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
-                  <CommandEmpty>No city found.</CommandEmpty>
-                  <CommandGroup heading="Suggestions">
-                    {popularCities.map((city) => (
-                      <CommandItem
-                        key={city}
-                        value={city}
-                        onSelect={(currentValue) => {
-                          setInputValue(currentValue);
-                          setShowSuggestions(false);
-                        }}
-                      >
-                        {city}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  {filteredCities.length > 0 ? (
+                    <CommandGroup heading="Suggestions">
+                      {filteredCities.map((city) => (
+                        <CommandItem
+                          key={city}
+                          value={city}
+                          onSelect={handleSelect}
+                        >
+                          {city}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ) : (
+                    <CommandEmpty>No city found.</CommandEmpty>
+                  )}
                 </CommandList>
               )}
             </Command>
