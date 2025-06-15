@@ -33,7 +33,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
         />
         <Button type="submit" size="lg" className="rounded-full bg-primary px-6 text-primary-foreground">
           <Search className="mr-2 h-5 w-5" />
-          Search
+          Brew
         </Button>
       </div>
     </form>

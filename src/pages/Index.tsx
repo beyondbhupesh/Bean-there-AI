@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
@@ -83,9 +82,9 @@ const Index = () => {
         <div className="flex h-screen flex-col items-center justify-center p-4">
            <div className="flex items-center space-x-4 mb-4">
               <Coffee className="h-16 w-16 text-primary" />
-              <h1 className="text-6xl font-bold tracking-tighter">ChillCoffee</h1>
+              <h1 className="text-6xl font-bold tracking-tighter">Bean There</h1>
             </div>
-          <p className="mb-8 text-xl text-muted-foreground">Discover the best specialty coffee shops in any city.</p>
+          <p className="mb-8 max-w-lg text-center text-xl text-muted-foreground">Discover the specialty coffee shops in your city or the one you're headed to</p>
           <SearchBar onSearch={handleSearch} />
         </div>
       ) : (

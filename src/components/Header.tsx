@@ -8,7 +8,7 @@ const Header = () => {
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="/" className="flex items-center space-x-2">
           <Coffee className="h-6 w-6 text-primary" />
-          <span className="font-bold">ChillCoffee</span>
+          <span className="font-bold">Bean There</span>
         </a>
       </div>
     </header>
